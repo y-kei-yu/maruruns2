@@ -1,6 +1,5 @@
 import axios from "axios";
-import { Button, Box, Input, Heading } from "@chakra-ui/react";
-// import DogImg from "./DogImg.jsx";
+import { Button, Box, Input, Heading, Text } from "@chakra-ui/react";
 
 function App() {
   const apiKey = import.meta.env.VITE_REACT_APP_OPENWEATHERMAP_API_KEY;
@@ -21,10 +20,10 @@ function App() {
   return (
     <>
       <div>
+        aaaa
         <Heading>🐕‍ おさんぽ日和チェッカー 🐶</Heading>
         <Text>今日のあなたの地域で今お散歩ができるかチェックできます！</Text>
-        <button onClick={apiCall}>API Call</button>
-        {/* <DogImg /> */}
+        <Button onClick={apiCall}> ボタン</Button>
       </div>
     </>
   );
