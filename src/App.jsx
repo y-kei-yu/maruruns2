@@ -9,10 +9,26 @@ import {
   Input,
   FormControl,
   FormLabel,
+  Flex,
 } from "@chakra-ui/react"; // spell-checker: disable-line
 import { DogImg } from "./DogImg";
+
+const getWeatherEmoji = (description) => {
+  const lowerDesc = description.toLowerCase();
+
+  if (lowerDesc.includes("clear")) return "☀️";
+  if (lowerDesc.includes("cloud")) return "☁️";
+  if (lowerDesc.includes("rain")) return "🌧️";
+  if (lowerDesc.includes("thunder")) return "⛈️";
+  if (lowerDesc.includes("snow")) return "❄️";
+
+  return "🌈"; // fallback
+};
+
 function App() {
   const [weather, setWeather] = useState(null); // 例: { condition: "sunny", temp: 31 }
+  const [city, setCity] = useState(""); // 入力された地域を管理するstate
+
   const getCardStyle = () => {
     switch (weather?.condition) {
       case "sunny":
@@ -32,26 +48,6 @@ function App() {
 
   const apiKey = import.meta.env.VITE_REACT_APP_OPENWEATHERMAP_API_KEY; // spell-checker: disable-line
 
-  // const [region, setRegion] = useState("");
-  const city = "okinawa";
-
-  //const onChangeRegion = (event) => setRegion(event.target.value);
-  const description = weather?.weather?.[0]?.description || "";
-  const emoji = description ? getWeatherEmoji(description) : "";
-
-  const getWeatherEmoji = (description) => {
-    const lowerDesc = description.toLowerCase();
-
-    if (lowerDesc.includes("clear")) return "☀️";
-    if (lowerDesc.includes("cloud")) return "☁️";
-    if (lowerDesc.includes("rain")) return "🌧️";
-    if (lowerDesc.includes("thunder")) return "⛈️";
-    if (lowerDesc.includes("snow")) return "❄️";
-
-    return "🌈"; // fallback
-  };
-  console.log("emoji", emoji);
-
   const apiCall = async () => {
     try {
       const response = await axios.get(
@@ -60,7 +56,7 @@ function App() {
       console.log("===================== response data =====================");
 
       setWeather(response.data);
-      console.log("Weather data:", weather);
+      console.log("Weather data:", response.data);
     } catch (error) {
       console.error("Error has occurred:", error);
     }
@@ -85,22 +81,39 @@ function App() {
             <DogImg />
             <FormControl>
               <FormLabel>地域を教えてください</FormLabel>
-              <Text>{weather?.condition?.toUpperCase() || "N/A"}</Text>
-              <Text>{getCardStyle().icon}</Text>
-              <Text>{weather?.temp ? `${weather.temp}℃` : "N/A"}</Text>
-              <Text>{getCardStyle().message}</Text>
-              <Stack direction="row">
-                <Input placeholder="東京" />
-                <Button colorScheme="blue" onClick={apiCall}>
-                  検索
-                </Button>
-              </Stack>
+              <Flex>
+                <Input
+                  placeholder="例: Tokyo"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)} // 入力値をstateに保存
+                />
+                <Text>{weather?.condition?.toUpperCase() || ""}</Text>
+                <Text>{getCardStyle().icon}</Text>
+                <Text>{weather?.temp ? `${weather.temp}℃` : ""}</Text>
+                <Text>{getCardStyle().message}</Text>
+                <Stack direction="row">
+                  <Button colorScheme="blue" onClick={apiCall}>
+                    検索
+                  </Button>
+                </Stack>
+              </Flex>
             </FormControl>
+            <div>
+              {weather && (
+                <div>
+                  <h2>{weather.name}</h2>
+                  <p>Temperature: {weather.main.temp}°C</p>
+                  <Heading>
+                    {getWeatherEmoji(weather.weather[0].description)}
+                  </Heading>
+                </div>
+              )}
+            </div>
           </Stack>
         </Box>
       </Box>
-      );
     </>
   );
 }
+
 export default App;
